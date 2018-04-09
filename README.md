@@ -40,9 +40,10 @@ export default Vue.extend({
 But if we add a method that uses any of the mapped methods the error appears:
 > Property 'pushStringArray' does not exist on type 'CombinedVueInstance<Vue, ...>'
 
-``` bash
+```
 import Vue from 'vue';
 import {mapActions, mapGetters, mapMutations} from 'vuex'
+
 export default Vue.extend({
   computed: {
     ...mapGetters({
@@ -64,7 +65,8 @@ export default Vue.extend({
     ...mapActions({
       pushStringArrayAsync: 'pushStringArrayAsync'
     }),
-    ***methodThatUsesActionOrMutation()*** {
+    methodThatUsesActionOrMutation() {
+      // HERE COMES THE ERROR
       this.pushStringArray();
       console.log('done');
     }
