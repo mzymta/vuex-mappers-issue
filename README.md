@@ -8,7 +8,7 @@ When you add mappers to the Vue component they work fine
 until you try to use mapped methods in component methods.
 
 The below code works fine:
-``` bash
+```
 import Vue from 'vue';
 import {mapActions, mapGetters, mapMutations} from 'vuex';
 
