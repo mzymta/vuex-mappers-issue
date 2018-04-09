@@ -1,11 +1,76 @@
-# vue-typescript-seed
+# Vuex mappers issue
 
-> A Vue.js seed project with TypeScript, TS-Jest, Nightwatch and ESlint
+A Vue.js/Typescript example project to address the Vuex mappers issue:
+> Error: Property NAME_OF_PROP does not exist on type 'CombinedVueInstance<Vue, ...>'
 
-It's highly recommended to use [Yarn](https://yarnpkg.com/en/) for this project 
+## Issue Example
+When you add mappers to the Vue component they work fine
+until you try to use mapped methods in component methods.
 
-Unit tests are done with Jest.
-e2e tests are based on Nightwatch and Cucumber.
+The below code works fine:
+``` bash
+import Vue from 'vue';
+import {mapActions, mapGetters, mapMutations} from 'vuex';
+
+export default Vue.extend({
+  computed: {
+    ...mapGetters({
+      getStringsArray: 'getStringsArray'
+    }),
+    newStr: {
+      get(): string {
+        return this.$store.state.newStr;
+      },
+      set(value: string) {
+        this.$store.commit('setNewStr', value);
+      }
+    }
+  },
+  methods: {
+    ...mapMutations({
+      pushStringArray: 'pushStringArray'
+    }),
+    ...mapActions({
+      pushStringArrayAsync: 'pushStringArrayAsync'
+    })
+  }
+});
+```
+
+But if we add a method that uses any of the mapped methods the error appears:
+> Property 'pushStringArray' does not exist on type 'CombinedVueInstance<Vue, ...>'
+
+``` bash
+import Vue from 'vue';
+import {mapActions, mapGetters, mapMutations} from 'vuex'
+export default Vue.extend({
+  computed: {
+    ...mapGetters({
+      getStringsArray: 'getStringsArray'
+    }),
+    newStr: {
+      get(): string {
+        return this.$store.state.newStr;
+      },
+      set(value: string) {
+        this.$store.commit('setNewStr', value);
+      }
+    }
+  },
+  methods: {
+    ...mapMutations({
+      pushStringArray: 'pushStringArray'
+    }),
+    ...mapActions({
+      pushStringArrayAsync: 'pushStringArrayAsync'
+    }),
+    ***methodThatUsesActionOrMutation()*** {
+      this.pushStringArray();
+      console.log('done');
+    }
+  }
+}
+```
 
 ## How to run
 ``` bash
@@ -35,54 +100,3 @@ yarn run e2e-html-report
 # Perform ESLint code check
 yarn run lint
 ```
-
-## Other commands
-```
-# build for production and view the bundle analyzer report
-yarn run build --report
-
-# Run unit tests in watch mode for development
-yarn run unit-watch
-
-# Perform ESLint code check + autofix all possible issues
-yarn run lint --fix
-```
-
-## WebStorm / Intellij IDEA configuration
-
-Enable ESlint plugin, Vue plugin and TypeScript integration.
-All of these should work by default.
-
-### Unit testing via Jest
-
-1. Click Run in the main toolbar
-2. Edit Configurations
-3. On the top left of the Run/Debug Configurations dialog, click the + sign.
-4. Choose Jest
-5. Name the new configuration "Jest"
-6. Under "Configuration file" enter `{YOUR_PATH}\test\unit\jest.conf.js` (be sure to change {YOUR_PATH})
-7. Click Apply 
-
-You can now both run Unit tests and debug them inside the IDE.
-
-### e2e testing via Nightwatch
-
-1. Click Run in the main toolbar
-2. Edit Configurations
-3. On the top left of the Run/Debug Configurations dialog, click the + sign.
-4. Choose Node.js
-5. Name the new configuration "Nightwatch"
-6. Under "JavaScript file" enter `node_modules\nightwatch\bin\runner.js`
-7. Under "Application parameters" enter `--config test/e2e/nightwatch.conf.js --env chrome`
-8. Click Apply 
-
-You can now both run e2e tests and debug them inside the IDE.
-
-**Note that this is different from running via console** `yarn run e2e` 
-**which also starts the http server and checks if port is in use.**
-
-**If your app is not served at default port (8080), change devServerURL in** `nightwatch.conf.js`
-
-**For this to work you will need a running SPA in background, e.g. run** `yarn run dev` **and start e2e in IDE afterwards.**
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
